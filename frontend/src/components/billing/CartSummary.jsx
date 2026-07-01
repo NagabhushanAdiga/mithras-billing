@@ -33,7 +33,7 @@ export default function CartSummary({
         </p>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-auto -mx-1 px-1 max-h-[50vh] lg:max-h-none">
+      <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1">
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center px-4">
             <div className="w-16 h-16 rounded-md bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center mb-4">

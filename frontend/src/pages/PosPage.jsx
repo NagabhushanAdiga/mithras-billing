@@ -521,11 +521,11 @@ export default function PosPage() {
   }, [cart.length, handleClearCart, patchPendingChanges])
 
   return (
-    <div className="h-full flex flex-col gap-5 sm:gap-6">
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
-        <div className="xl:col-span-2 flex flex-col gap-4 sm:gap-5">
+    <div className="h-full max-h-full flex flex-col min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-3 grid-rows-[minmax(0,1fr)_auto] xl:grid-rows-1 gap-4 sm:gap-6 overflow-hidden">
+        <div className="xl:col-span-2 flex flex-col gap-4 sm:gap-5 min-h-0 overflow-hidden">
           <Card
-            className={`p-5 sm:p-6 border-2 border-violet-200 shadow-lg shadow-violet-100/60 !overflow-visible transition-opacity ${
+            className={`shrink-0 p-5 sm:p-6 border-2 border-violet-200 shadow-lg shadow-violet-100/60 !overflow-visible transition-opacity ${
               posModalOpen ? 'opacity-40 pointer-events-none' : ''
             }`}
           >
@@ -658,12 +658,12 @@ export default function PosPage() {
             )}
           </Card>
 
-          <Card className="p-5 sm:p-6 flex-1 flex flex-col min-h-[320px]">
-            <h2 className="text-base font-bold bg-gradient-to-r from-violet-700 to-fuchsia-600 bg-clip-text text-transparent mb-1 flex items-center gap-2">
+          <Card className="p-5 sm:p-6 flex-1 min-h-0 flex flex-col overflow-hidden">
+            <h2 className="shrink-0 text-base font-bold bg-gradient-to-r from-violet-700 to-fuchsia-600 bg-clip-text text-transparent mb-1 flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 animate-pulse" />
               Current bill
             </h2>
-            <p className="text-slate-400 text-xs mb-4">
+            <p className="shrink-0 text-slate-400 text-xs mb-4">
               Use +/− or type quantity (e.g. 1.2 for kg; cannot exceed stock){discountEnabled ? ' · discount applies from product settings' : ''}
             </p>
             <CartSummary
@@ -682,7 +682,7 @@ export default function PosPage() {
           </Card>
         </div>
 
-        <div className="xl:col-span-1">
+        <div className="xl:col-span-1 min-h-0 xl:overflow-y-auto shrink-0">
           <PosSummaryPanel
             itemCount={cart.length}
             totalQty={totalQty}

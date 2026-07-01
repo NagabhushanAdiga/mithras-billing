@@ -29,7 +29,7 @@ export default function PosSummaryPanel({
   const hasBillDiscount = billDiscountAmount > 0
 
   return (
-    <div className="sticky top-4 space-y-4">
+    <div className="xl:sticky xl:top-0 space-y-4">
       <Card className="p-4 sm:p-5 space-y-4">
         <div className="rounded-md bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-600 text-white p-5 sm:p-6 shadow-xl shadow-fuchsia-500/30 ring-2 ring-white/20">
           <p className="text-fuchsia-100 text-xs font-bold uppercase tracking-wider">Bill total</p>

@@ -9,15 +9,15 @@ import { logAudit } from '../utils/auditLog'
 import { generateUniqueInvoiceId } from '../utils/invoiceId'
 import { USE_API } from '../api/client'
 import { bootstrap, eraseAll, purge } from '../api/services/storeService'
-import { create as createProduct, update as updateProduct, remove as removeProduct } from '../api/services/productService'
-import { create as createCategory, update as updateCategory, remove as removeCategory } from '../api/services/categoryService'
+import { create as createProductApi, update as updateProductApi, remove as removeProductApi } from '../api/services/productService'
+import { create as createCategoryApi, update as updateCategoryApi, remove as removeCategoryApi } from '../api/services/categoryService'
 import {
-  create as createSubcategory,
-  update as updateSubcategory,
-  remove as removeSubcategory,
+  create as createSubcategoryApi,
+  update as updateSubcategoryApi,
+  remove as removeSubcategoryApi,
 } from '../api/services/subcategoryService'
-import { create as createBatch, remove as removeBatch } from '../api/services/batchService'
-import { create as createOrder } from '../api/services/orderService'
+import { create as createBatchApi, remove as removeBatchApi } from '../api/services/batchService'
+import { create as createOrderApi } from '../api/services/orderService'
 import { update as updateSettings } from '../api/services/settingsService'
 import { useAuth } from './AuthContext'
 
@@ -201,7 +201,7 @@ export function StoreProvider({ children }) {
     if (!trimmed) return null
     if (USE_API) {
       try {
-        const { batch } = await createBatch(trimmed)
+        const { batch } = await createBatchApi(trimmed)
         setBatches((prev) => [...prev.filter((b) => b.id !== batch.id), batch])
         return batch.id
       } catch {
@@ -219,7 +219,7 @@ export function StoreProvider({ children }) {
   const deleteBatch = useCallback(async (id) => {
     if (USE_API) {
       try {
-        await removeBatch(id)
+        await removeBatchApi(id)
         setBatches((prev) => prev.filter((b) => b.id !== id))
         refreshStoreInBackground()
       } catch {
@@ -240,7 +240,7 @@ export function StoreProvider({ children }) {
     if (!trimmed) return null
     if (USE_API) {
       try {
-        const { group } = await createCategory(trimmed)
+        const { group } = await createCategoryApi(trimmed)
         setGroups((prev) => normalizeGroups([...prev, group]))
         return group.id
       } catch {
@@ -260,7 +260,7 @@ export function StoreProvider({ children }) {
     if (!trimmed) return false
     if (USE_API) {
       try {
-        const { group } = await updateCategory(id, trimmed)
+        const { group } = await updateCategoryApi(id, trimmed)
         setGroups((prev) => {
           const next = normalizeGroups(prev.map((g) => (g.id === id ? group : g)))
           setProducts((prods) =>
@@ -296,7 +296,7 @@ export function StoreProvider({ children }) {
     if (!trimmed) return null
     if (USE_API) {
       try {
-        const { subcategory, group } = await createSubcategory(groupId, trimmed)
+        const { subcategory, group } = await createSubcategoryApi(groupId, trimmed)
         setGroups((prev) => normalizeGroups(prev.map((g) => (g.id === groupId ? group : g))))
         return subcategory.id
       } catch {
@@ -327,7 +327,7 @@ export function StoreProvider({ children }) {
     if (!trimmed) return false
     if (USE_API) {
       try {
-        const { group } = await updateSubcategory(groupId, subcategoryId, trimmed)
+        const { group } = await updateSubcategoryApi(groupId, subcategoryId, trimmed)
         setGroups((prev) => {
           const next = normalizeGroups(prev.map((g) => (g.id === groupId ? group : g)))
           setProducts((prods) =>
@@ -384,7 +384,7 @@ export function StoreProvider({ children }) {
   const deleteSubcategory = useCallback(async (groupId, subcategoryId) => {
     if (USE_API) {
       try {
-        const { group } = await removeSubcategory(groupId, subcategoryId)
+        const { group } = await removeSubcategoryApi(groupId, subcategoryId)
         setGroups((prev) => {
           const next = normalizeGroups(prev.map((g) => (g.id === groupId ? group : g)))
           setProducts((prods) =>
@@ -425,7 +425,7 @@ export function StoreProvider({ children }) {
   const deleteGroup = useCallback(async (id) => {
     if (USE_API) {
       try {
-        await removeCategory(id)
+        await removeCategoryApi(id)
         setGroups((prev) => prev.filter((g) => g.id !== id))
         refreshStoreInBackground()
       } catch {
@@ -460,7 +460,7 @@ export function StoreProvider({ children }) {
 
     if (USE_API) {
       try {
-        const { product: created, id } = await createProduct({ ...product, barcode: code })
+        const { product: created, id } = await createProductApi({ ...product, barcode: code })
         setProducts((prev) =>
           normalizeProducts(
             [...prev.filter((p) => p.id !== created.id), created],
@@ -506,7 +506,7 @@ export function StoreProvider({ children }) {
 
     if (USE_API) {
       try {
-        const { product } = await updateProduct(id, safeUpdates)
+        const { product } = await updateProductApi(id, safeUpdates)
         setProducts((prev) =>
           normalizeProducts(
             prev.map((p) => (p.id === id ? product : p)),
@@ -558,7 +558,7 @@ export function StoreProvider({ children }) {
   const deleteProduct = useCallback(async (id) => {
     if (USE_API) {
       try {
-        await removeProduct(id)
+        await removeProductApi(id)
         setProducts((prev) => prev.filter((p) => p.id !== id))
       } catch {
         // ignore
@@ -651,8 +651,8 @@ export function StoreProvider({ children }) {
 
   const addOrder = useCallback(async (order) => {
     if (USE_API) {
-      const { order, id } = await createOrder(order)
-      setOrders((prev) => [order, ...prev.filter((o) => o.id !== order.id)])
+      const { order: createdOrder, id } = await createOrderApi(order)
+      setOrders((prev) => [createdOrder, ...prev.filter((o) => o.id !== createdOrder.id)])
       refreshStoreInBackground()
       return id
     }

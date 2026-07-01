@@ -27,18 +27,20 @@ app.use(async (req, res, next) => {
   }
 })
 
-// Vercel routes /api/* to api/index.js with the /api prefix stripped
-const apiPrefix = env.isVercel ? '' : '/api'
-app.use(apiPrefix, routes)
-
+// Local dev uses /api/*; Vercel may deliver either /api/* or stripped paths.
+app.use('/api', routes)
 if (env.isVercel) {
-  app.get('/', (req, res) => {
+  app.use(routes)
+
+  const rootHandler = (_req, res) => {
     res.json({
       ok: true,
       service: 'billing-api',
       message: 'API is running. Try /api/health',
     })
-  })
+  }
+  app.get('/', rootHandler)
+  app.get('/api', rootHandler)
 }
 
 app.use(notFoundHandler)

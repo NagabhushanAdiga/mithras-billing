@@ -40,19 +40,23 @@ function toPublicUser(user) {
   return rest
 }
 
+function loadCachedUser() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.user)
+    return saved ? JSON.parse(saved) : null
+  } catch {
+    return null
+  }
+}
+
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [accounts, setAccounts] = useState(loadUsers)
   const [teamMembers, setTeamMembers] = useState([])
   const [user, setUser] = useState(() => {
-    if (USE_API) return null
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.user)
-      return saved ? JSON.parse(saved) : null
-    } catch {
-      return null
-    }
+    if (!USE_API) return loadCachedUser()
+    return getToken() ? loadCachedUser() : null
   })
   const [isAuthReady, setIsAuthReady] = useState(!USE_API)
 
@@ -90,14 +94,17 @@ export function AuthProvider({ children }) {
         if (!current) {
           setToken(null)
           setUser(null)
+          localStorage.removeItem(STORAGE_KEYS.user)
           return
         }
         setUser(current)
+        localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(current))
         if (isAdminRole(current.role)) await loadTeamMembers()
       })
       .catch(() => {
         setToken(null)
         setUser(null)
+        localStorage.removeItem(STORAGE_KEYS.user)
       })
       .finally(() => setIsAuthReady(true))
   }, [loadTeamMembers])
@@ -112,6 +119,7 @@ export function AuthProvider({ children }) {
           }
           setToken(token)
           setUser(loggedIn)
+          localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(loggedIn))
           logAudit('login', {
             category: 'auth',
             details: `Signed in as ${loggedIn.username} (${loggedIn.role})`,
@@ -176,6 +184,7 @@ export function AuthProvider({ children }) {
         // ignore
       }
       setToken(null)
+      localStorage.removeItem(STORAGE_KEYS.user)
     } else {
       localStorage.removeItem(STORAGE_KEYS.user)
     }

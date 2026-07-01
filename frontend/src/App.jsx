@@ -24,6 +24,17 @@ import { usePendingChanges } from './hooks/usePendingChanges'
 
 const APP_INITIAL = { currentPath: '/', pageLoading: true }
 
+function AuthBootScreen() {
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div
+        className="h-9 w-9 rounded-full border-2 border-violet-600 border-t-transparent animate-spin"
+        aria-label="Loading"
+      />
+    </div>
+  )
+}
+
 function AppContent() {
   const { isAuthenticated, user, isAuthReady } = useAuth()
   const { isStoreReady } = useStore()
@@ -31,10 +42,10 @@ function AppContent() {
   const { currentPath, pageLoading } = pendingChanges
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (isAuthReady && !isAuthenticated) {
       patchPendingChanges({ currentPath: '/' })
     }
-  }, [isAuthenticated, patchPendingChanges])
+  }, [isAuthReady, isAuthenticated, patchPendingChanges])
 
   useEffect(() => {
     if (!user?.role) return
@@ -57,7 +68,14 @@ function AppContent() {
   }, [currentPath, isAuthenticated, patchPendingChanges])
 
   if (!isAuthReady) {
-    return <LoginPage onSuccess={() => {}} />
+    if (user) {
+      return (
+        <MainLayout currentPath="/" onNavigate={() => {}}>
+          <PageSkeleton path="/" />
+        </MainLayout>
+      )
+    }
+    return <AuthBootScreen />
   }
 
   if (!isAuthenticated) {

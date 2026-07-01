@@ -1,6 +1,5 @@
 {
-  "name": "mithras-billing",
-  "version": "1.0.0",
+  "name": "mithras-billing-api",
   "private": true,
   "type": "module",
   "engines": {

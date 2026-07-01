@@ -1,0 +1,258 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  height: 100%;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+.app-shell {
+  background-color: #ffffff;
+}
+
+.login-shell {
+  background-color: #ffffff;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.support-shell {
+  background-color: #ffffff;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+.field-input {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.375rem;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #0f172a;
+  font-size: 0.9375rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+
+.field-input:hover:not(:focus):not(:disabled):not(:read-only) {
+  border-color: #94a3b8;
+}
+
+.field-input::placeholder {
+  color: #94a3b8;
+}
+
+.field-input:focus {
+  outline: none;
+  background: #fff;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+}
+
+.field-input:disabled,
+.field-input:read-only {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.field-input-error {
+  border-color: #f87171;
+  background: #fff;
+}
+
+.field-input-error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.field-input-wrap {
+  position: relative;
+}
+
+.field-input-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #94a3b8;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.field-input-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: block;
+  flex-shrink: 0;
+}
+
+.field-input-with-icon {
+  padding-left: 2.625rem;
+}
+
+.field-select {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.375rem;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #0f172a;
+  font-size: 0.9375rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+
+.field-select:hover:not(:focus):not(:disabled) {
+  border-color: #94a3b8;
+}
+
+.field-select:focus {
+  outline: none;
+  background: #fff;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+}
+
+.field-select:disabled {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.barcode-input .field-input {
+  font-size: 1rem;
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+  border-width: 2px;
+  border-color: #a78bfa;
+}
+
+.barcode-input .field-input:focus {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+.barcode-input .field-input-icon {
+  color: #8b5cf6;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c4b5fd transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #34d399, #60a5fa, #c084fc);
+  border-radius: 999px;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.toast-enter {
+  animation: toast-in 0.25s ease-out;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 0%,
+    #e9d5ff 35%,
+    #fae8ff 50%,
+    #e9d5ff 65%,
+    #f1f5f9 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin 0.7s linear infinite;
+}
+
+/* Pointer on interactive controls app-wide */
+button:not(:disabled),
+[type='button']:not(:disabled),
+[type='submit']:not(:disabled),
+[type='reset']:not(:disabled),
+[role='button']:not([aria-disabled='true']),
+a[href],
+label:has(input[type='checkbox']),
+label:has(input[type='radio']),
+select:not(:disabled),
+summary {
+  cursor: pointer;
+}
+
+button:disabled,
+select:disabled,
+[disabled] {
+  cursor: not-allowed;
+}
+
+/* Keep injected invoice HTML readable inside the app (Tailwind base resets table styles). */
+.invoice-preview-root {
+  color: #0f172a;
+  background-color: #ffffff;
+}
+
+.invoice-preview-root table {
+  border-collapse: collapse;
+}
+
+.invoice-preview-root thead th {
+  background-color: #1e293b;
+  color: #ffffff;
+}

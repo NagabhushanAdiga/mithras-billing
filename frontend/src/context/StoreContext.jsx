@@ -128,7 +128,7 @@ export function StoreProvider({ children }) {
 
   const refreshStoreInBackground = useCallback(() => {
     void reloadStore().catch(() => {})
-  }, [refreshStoreInBackground])
+  }, [reloadStore])
 
   useEffect(() => {
     if (!USE_API) {
@@ -214,7 +214,7 @@ export function StoreProvider({ children }) {
     setBatches((prev) => [...prev, { id, name: trimmed }])
     logAudit('batch_created', { category: 'category', details: trimmed })
     return id
-  }, [batches, refreshStoreInBackground])
+  }, [batches])
 
   const deleteBatch = useCallback(async (id) => {
     if (USE_API) {
@@ -253,7 +253,7 @@ export function StoreProvider({ children }) {
     setGroups((prev) => [...prev, { id, name: trimmed, subcategories: [] }])
     logAudit('category_created', { category: 'category', details: trimmed })
     return id
-  }, [groups, refreshStoreInBackground])
+  }, [groups])
 
   const updateGroup = useCallback(async (id, name) => {
     const trimmed = String(name).trim()
@@ -289,7 +289,7 @@ export function StoreProvider({ children }) {
     )
     logAudit('category_updated', { category: 'category', details: trimmed })
     return true
-  }, [groups, refreshStoreInBackground])
+  }, [groups])
 
   const addSubcategory = useCallback(async (groupId, name) => {
     const trimmed = String(name).trim()
@@ -320,7 +320,7 @@ export function StoreProvider({ children }) {
       details: `${group.name} → ${trimmed}`,
     })
     return id
-  }, [groups, refreshStoreInBackground])
+  }, [groups])
 
   const updateSubcategory = useCallback(async (groupId, subcategoryId, name) => {
     const trimmed = String(name).trim()
@@ -379,7 +379,7 @@ export function StoreProvider({ children }) {
       details: `${group.name} → ${sub?.name || subcategoryId} renamed to ${trimmed}`,
     })
     return true
-  }, [groups, refreshStoreInBackground])
+  }, [groups])
 
   const deleteSubcategory = useCallback(async (groupId, subcategoryId) => {
     if (USE_API) {
@@ -420,7 +420,7 @@ export function StoreProvider({ children }) {
       category: 'category',
       details: `${group?.name || groupId} → ${sub?.name || subcategoryId}`,
     })
-  }, [groups, refreshStoreInBackground])
+  }, [groups])
 
   const deleteGroup = useCallback(async (id) => {
     if (USE_API) {

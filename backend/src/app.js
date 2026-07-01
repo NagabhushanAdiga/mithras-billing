@@ -31,16 +31,6 @@ app.use(async (req, res, next) => {
 app.use('/api', routes)
 if (env.isVercel) {
   app.use(routes)
-
-  const rootHandler = (_req, res) => {
-    res.json({
-      ok: true,
-      service: 'billing-api',
-      message: 'API is running. Try /api/health',
-    })
-  }
-  app.get('/', rootHandler)
-  app.get('/api', rootHandler)
 }
 
 app.use(notFoundHandler)

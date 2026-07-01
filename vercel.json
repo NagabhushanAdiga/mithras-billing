@@ -1,18 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "npm install --prefix backend && cd frontend && NPM_CONFIG_PRODUCTION=false npm install",
-  "buildCommand": "cd frontend && npm run build",
+  "installCommand": "npm install --prefix api && cd frontend && NPM_CONFIG_PRODUCTION=false npm install",
+  "buildCommand": "rm -rf api/_backend && cp -r backend/src api/_backend && cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
   "functions": {
-    "backend/api/index.js": {
-      "includeFiles": "backend/src/**",
+    "api/index.js": {
       "maxDuration": 30
     }
   },
   "rewrites": [
-    { "source": "/api", "destination": "/backend/api" },
-    { "source": "/api/(.*)", "destination": "/backend/api" },
+    { "source": "/api", "destination": "/api" },
+    { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

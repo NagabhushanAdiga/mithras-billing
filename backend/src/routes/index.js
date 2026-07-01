@@ -7,17 +7,27 @@ import batchRoutes from './batchRoutes.js'
 import orderRoutes from './orderRoutes.js'
 import settingsRoutes from './settingsRoutes.js'
 import auditRoutes, { storeRouter } from './auditRoutes.js'
-import { getConnectionState } from '../config/db.js'
+import { connectDb, getConnectionState } from '../config/db.js'
 
 const router = Router()
 
-router.get('/health', (req, res) => {
-  const mongoState = getConnectionState()
-  res.json({
-    ok: mongoState === 1,
-    service: 'billing-api',
-    database: mongoState === 1 ? 'connected' : 'disconnected',
-  })
+router.get('/health', async (req, res) => {
+  try {
+    await connectDb()
+    const mongoState = getConnectionState()
+    res.json({
+      ok: mongoState === 1,
+      service: 'billing-api',
+      database: mongoState === 1 ? 'connected' : 'disconnected',
+    })
+  } catch (err) {
+    res.status(503).json({
+      ok: false,
+      service: 'billing-api',
+      database: 'disconnected',
+      error: err.message,
+    })
+  }
 })
 
 router.use('/auth', authRoutes)

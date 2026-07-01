@@ -6,6 +6,7 @@ import {
   logAudit as writeAudit,
   clearAuditLog as wipeAudit,
   subscribeAuditLog,
+  onAuditEntry,
 } from '../utils/auditLog'
 
 const AuditContext = createContext(null)
@@ -29,30 +30,17 @@ export function AuditProvider({ children }) {
         if (!cancelled) setEntries([])
       })
 
+    const unsub = onAuditEntry((entry) => {
+      setEntries((prev) => [entry, ...prev].slice(0, MAX_ENTRIES))
+    })
+
     return () => {
       cancelled = true
+      unsub()
     }
   }, [])
 
-  const logAudit = useCallback((action, opts = {}) => {
-    if (USE_API) {
-      auditService
-        .create({
-          action,
-          category: opts.category,
-          details: opts.details,
-        })
-        .then((data) => {
-          const entry = data.entry
-          if (entry) {
-            setEntries((prev) => [entry, ...prev].slice(0, MAX_ENTRIES))
-          }
-        })
-        .catch(() => {})
-      return null
-    }
-    return writeAudit(action, opts)
-  }, [])
+  const logAudit = useCallback((action, opts = {}) => writeAudit(action, opts), [])
 
   const clearAuditLog = useCallback(() => {
     if (USE_API) {

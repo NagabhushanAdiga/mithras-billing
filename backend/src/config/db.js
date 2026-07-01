@@ -22,6 +22,10 @@ export async function connectDb() {
         bufferCommands: false,
       })
       .then((instance) => instance)
+      .catch((err) => {
+        cache.promise = null
+        throw err
+      })
   }
 
   cache.conn = await cache.promise

@@ -40,6 +40,7 @@ export const UserModel = {
   },
 
   verifyPassword(user, password) {
+    if (!user?.password_hash || !password) return false
     return bcrypt.compareSync(password, user.password_hash)
   },
 

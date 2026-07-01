@@ -16,7 +16,7 @@ import PageHeader from '../components/common/PageHeader'
 import Pagination from '../components/common/Pagination'
 import { useStore } from '../context/StoreContext'
 import { useToast } from '../context/ToastContext'
-import { useAsyncAction, delay } from '../hooks/useAsyncAction'
+import { useAsyncAction } from '../hooks/useAsyncAction'
 import { usePagination } from '../hooks/usePagination'
 import { usePendingChanges } from '../hooks/usePendingChanges'
 
@@ -117,30 +117,30 @@ export default function GroupsPage() {
     })
   }
 
-  const handleCategorySubmit = (name, category) => {
+  const handleCategorySubmit = async (name, category) => {
     if (category) {
-      const ok = updateGroup(category.id, name)
+      const ok = await updateGroup(category.id, name)
       if (!ok) return null
       closeCategorySlider()
       showToast(`Category "${name}" updated`)
       return category.id
     }
-    const id = addGroup(name)
+    const id = await addGroup(name)
     if (!id) return null
     closeCategorySlider()
     showToast(`Category "${name}" created`)
     return id
   }
 
-  const handleSubcategorySubmit = (groupId, name, subcategory) => {
+  const handleSubcategorySubmit = async (groupId, name, subcategory) => {
     if (subcategory) {
-      const ok = updateSubcategory(groupId, subcategory.id, name)
+      const ok = await updateSubcategory(groupId, subcategory.id, name)
       if (!ok) return null
       closeSubcategorySlider()
       showToast(`Subcategory "${name}" updated`)
       return subcategory.id
     }
-    const id = addSubcategory(groupId, name)
+    const id = await addSubcategory(groupId, name)
     if (!id) return null
     closeSubcategorySlider()
     showToast(`Subcategory "${name}" added`)
@@ -150,8 +150,7 @@ export default function GroupsPage() {
   const confirmDeleteCategory = () => {
     if (!deleteConfirm) return
     runDelete(async () => {
-      await delay(300)
-      deleteGroup(deleteConfirm.id)
+      await deleteGroup(deleteConfirm.id)
       showToast(`Category "${deleteConfirm.name}" deleted`, 'info')
       patchPendingChanges({ deleteConfirm: null })
     })
@@ -160,8 +159,7 @@ export default function GroupsPage() {
   const confirmDeleteSubcategory = () => {
     if (!deleteSubConfirm) return
     runDelete(async () => {
-      await delay(300)
-      deleteSubcategory(deleteSubConfirm.groupId, deleteSubConfirm.subcategory.id)
+      await deleteSubcategory(deleteSubConfirm.groupId, deleteSubConfirm.subcategory.id)
       showToast(`Subcategory "${deleteSubConfirm.subcategory.name}" deleted`, 'info')
       patchPendingChanges({ deleteSubConfirm: null })
     })

@@ -1,7 +1,7 @@
 import { useAuth } from '../../context/AuthContext'
 import Button from '../common/Button'
 import Input from '../common/Input'
-import { useAsyncAction, delay } from '../../hooks/useAsyncAction'
+import { useAsyncAction } from '../../hooks/useAsyncAction'
 import { usePendingChanges } from '../../hooks/usePendingChanges'
 
 const INITIAL = { username: '', password: '', error: '' }
@@ -16,7 +16,6 @@ export default function LoginForm({ onSuccess }) {
     e.preventDefault()
     patchPendingChanges({ error: '' })
     run(async () => {
-      await delay(300)
       const result = await login(username, password)
       if (result.success) {
         onSuccess?.()

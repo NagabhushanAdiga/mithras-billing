@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react'
 export function useAsyncAction() {
   const [loading, setLoading] = useState(false)
 
-  const run = useCallback(async (fn, minMs = 400) => {
+  const run = useCallback(async (fn, minMs = 0) => {
     setLoading(true)
     const start = Date.now()
     try {

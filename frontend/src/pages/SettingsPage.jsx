@@ -21,7 +21,7 @@ import { isAdminRole } from '../utils/roles'
 import { useToast } from '../context/ToastContext'
 import { useAudit } from '../context/AuditContext'
 import { logAudit } from '../utils/auditLog'
-import { useAsyncAction, delay } from '../hooks/useAsyncAction'
+import { useAsyncAction } from '../hooks/useAsyncAction'
 import { usePagination } from '../hooks/usePagination'
 import { usePendingChanges } from '../hooks/usePendingChanges'
 import { formatProductDiscount, clampDiscount, discountBasePrice } from '../utils/billing'
@@ -259,7 +259,6 @@ export default function SettingsPage() {
       !website ? '' : /^https?:\/\//i.test(website) ? website : `https://${website}`
 
     await runSave(async () => {
-      await delay(300)
       setSettings({
         storeName: storeName.trim() || 'SuperMart Billing',
         storeAddress: storeAddress.trim(),
@@ -306,7 +305,6 @@ export default function SettingsPage() {
     }
 
     await runApplyDiscount(async () => {
-      await delay(300)
       const result = await updateProduct(selectedProductId, { discount: clamped })
       if (!result?.ok) {
         showToast(result?.error || 'Could not update product discount', 'error')
@@ -332,7 +330,6 @@ export default function SettingsPage() {
       return
     }
     await runChangePassword(async () => {
-      await delay(300)
       const result = await changePassword({
         currentPassword,
         newPassword,
@@ -440,7 +437,6 @@ export default function SettingsPage() {
 
     const keys = [...selectedPurgeKeys]
     runPurgeData(async () => {
-      await delay(400)
       await runPurge(keys)
       patchPendingChanges({
         purgeSelection: EMPTY_PURGE_SELECTION,
@@ -479,7 +475,6 @@ export default function SettingsPage() {
 
     setExportingKey(key)
     try {
-      await delay(200)
       const data = exportDataByKey[key]
       const filename = exporter(data, storeMeta)
       logAudit('data_exported', {
@@ -505,7 +500,6 @@ export default function SettingsPage() {
     }
 
     runEraseData(async () => {
-      await delay(400)
       await eraseAllData()
       clearAllTickets()
       if (USE_API) {

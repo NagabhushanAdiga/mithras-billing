@@ -4,7 +4,7 @@ import Input from '../components/common/Input'
 import FormActions from '../components/common/FormActions'
 import SliderPanelHeader from '../components/common/SliderPanelHeader'
 import { TICKET_CATEGORIES, TICKET_PRIORITIES } from './constants'
-import { useAsyncAction, delay } from '../hooks/useAsyncAction'
+import { useAsyncAction } from '../hooks/useAsyncAction'
 import { usePendingChanges } from '../hooks/usePendingChanges'
 
 const FORM_ID = 'raise-ticket-form'
@@ -47,7 +47,6 @@ export default function RaiseTicketModal({ open, onSubmit, onClose }) {
       return
     }
     run(async () => {
-      await delay(350)
       onSubmit?.({
         subject: subject.trim(),
         description: description.trim(),

@@ -16,7 +16,7 @@ import { useAudit } from '../context/AuditContext'
 import { useAuth } from '../context/AuthContext'
 import { useStore } from '../context/StoreContext'
 import { useToast } from '../context/ToastContext'
-import { useAsyncAction, delay } from '../hooks/useAsyncAction'
+import { useAsyncAction } from '../hooks/useAsyncAction'
 import { usePagination } from '../hooks/usePagination'
 import { usePendingChanges } from '../hooks/usePendingChanges'
 import { USE_API } from '../api/client'
@@ -156,7 +156,6 @@ export default function AuditPage() {
 
   const handleExport = () => {
     runExport(async () => {
-      await delay(200)
       try {
         const filename = exportAuditLogExcel(
           filtered,
@@ -189,8 +188,6 @@ export default function AuditPage() {
         patchPendingChanges({ clearPasswordError: 'Incorrect password' })
         return
       }
-
-      await delay(200)
 
       if (USE_API) {
         try {

@@ -16,7 +16,7 @@ import Pagination from '../components/common/Pagination'
 import TableIdentityCell from '../components/common/TableIdentityCell'
 import { useStore } from '../context/StoreContext'
 import { useToast } from '../context/ToastContext'
-import { useAsyncAction, delay } from '../hooks/useAsyncAction'
+import { useAsyncAction } from '../hooks/useAsyncAction'
 import { usePagination } from '../hooks/usePagination'
 import { usePendingChanges } from '../hooks/usePendingChanges'
 import {
@@ -120,7 +120,6 @@ export default function ReportsPage() {
 
   const handleExport = () => {
     runExport(async () => {
-      await delay(200)
       try {
         const filename = exportSalesReportExcel(orders, products, pendingChanges, storeMeta)
         logAudit('report_exported', {

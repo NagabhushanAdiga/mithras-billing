@@ -3,7 +3,7 @@ import { HiOutlineArchive } from 'react-icons/hi'
 import Input from '../common/Input'
 import FormActions from '../common/FormActions'
 import SliderPanelHeader from '../common/SliderPanelHeader'
-import { useAsyncAction, delay } from '../../hooks/useAsyncAction'
+import { useAsyncAction } from '../../hooks/useAsyncAction'
 import { usePendingChanges } from '../../hooks/usePendingChanges'
 
 const FORM_ID = 'add-batch-form'
@@ -45,8 +45,7 @@ export default function BatchSlider({ open, onSubmit, onCancel }) {
       return
     }
     run(async () => {
-      await delay(300)
-      const result = onSubmit?.(trimmed)
+      const result = await Promise.resolve(onSubmit?.(trimmed))
       if (result === null) {
         patchPendingChanges({ error: 'A batch with this name already exists.' })
         return

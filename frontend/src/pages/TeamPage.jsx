@@ -11,7 +11,7 @@ import ConfirmDialog from '../components/common/ConfirmDialog'
 import { useAuth } from '../context/AuthContext'
 import { isAdminRole, roleLabel } from '../utils/roles'
 import { useToast } from '../context/ToastContext'
-import { useAsyncAction, delay } from '../hooks/useAsyncAction'
+import { useAsyncAction } from '../hooks/useAsyncAction'
 import { usePagination } from '../hooks/usePagination'
 import { usePendingChanges } from '../hooks/usePendingChanges'
 
@@ -168,8 +168,6 @@ export default function TeamPage() {
           return
         }
       }
-
-      await delay(250)
       const addedRole = role
       const result = await addUser({
         name,
@@ -202,7 +200,6 @@ export default function TeamPage() {
     if (!deleteConfirm) return
     const member = deleteConfirm
     runDelete(async () => {
-      await delay(200)
       const result = await deleteUser(member.id, user?.id)
       if (!result.ok) {
         showToast(result.error, 'error')
@@ -220,7 +217,6 @@ export default function TeamPage() {
       return
     }
     runReset(async () => {
-      await delay(250)
       const result = resetUserPassword({ userId: resetMember.id, newPassword })
       if (!result.ok) {
         showToast(result.error || 'Could not reset password', 'error')

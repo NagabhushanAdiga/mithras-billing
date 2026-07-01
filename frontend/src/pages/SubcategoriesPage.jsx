@@ -14,7 +14,7 @@ import Pagination from '../components/common/Pagination'
 import SubcategorySlider from '../components/groups/SubcategorySlider'
 import { useStore } from '../context/StoreContext'
 import { useToast } from '../context/ToastContext'
-import { useAsyncAction, delay } from '../hooks/useAsyncAction'
+import { useAsyncAction } from '../hooks/useAsyncAction'
 import { usePagination } from '../hooks/usePagination'
 import { usePendingChanges } from '../hooks/usePendingChanges'
 
@@ -79,15 +79,15 @@ export default function SubcategoriesPage() {
     patchPendingChanges({ showSlider: false, editingRow: null })
   }
 
-  const handleSubmit = (groupId, name, subcategory) => {
+  const handleSubmit = async (groupId, name, subcategory) => {
     if (subcategory) {
-      const ok = updateSubcategory(groupId, subcategory.id, name)
+      const ok = await updateSubcategory(groupId, subcategory.id, name)
       if (!ok) return null
       closeSlider()
       showToast(`Subcategory "${name}" updated`)
       return subcategory.id
     }
-    const id = addSubcategory(groupId, name)
+    const id = await addSubcategory(groupId, name)
     if (!id) return null
     closeSlider()
     showToast(`Subcategory "${name}" added`)
@@ -97,8 +97,7 @@ export default function SubcategoriesPage() {
   const confirmDelete = () => {
     if (!deleteConfirm) return
     runDelete(async () => {
-      await delay(300)
-      deleteSubcategory(deleteConfirm.groupId, deleteConfirm.id)
+      await deleteSubcategory(deleteConfirm.groupId, deleteConfirm.id)
       showToast(`Subcategory "${deleteConfirm.name}" deleted`, 'info')
       patchPendingChanges({ deleteConfirm: null })
     })

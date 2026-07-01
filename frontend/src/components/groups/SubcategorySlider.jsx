@@ -3,7 +3,7 @@ import { HiOutlineCollection } from 'react-icons/hi'
 import Input from '../common/Input'
 import FormActions from '../common/FormActions'
 import SliderPanelHeader from '../common/SliderPanelHeader'
-import { useAsyncAction, delay } from '../../hooks/useAsyncAction'
+import { useAsyncAction } from '../../hooks/useAsyncAction'
 import { usePendingChanges } from '../../hooks/usePendingChanges'
 
 const FORM_ID = 'subcategory-form'
@@ -65,8 +65,7 @@ export default function SubcategorySlider({
       return
     }
     run(async () => {
-      await delay(300)
-      const result = onSubmit?.(activeParent.id, trimmed, subcategory)
+      const result = await Promise.resolve(onSubmit?.(activeParent.id, trimmed, subcategory))
       if (result === null || result === false) {
         patchPendingChanges({ error: 'A subcategory with this name already exists in this category.' })
         return

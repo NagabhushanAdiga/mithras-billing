@@ -17,7 +17,7 @@ import { generateInvoicePdfForPrint } from '../utils/generateInvoicePdf'
 import { calcCartTotals, applyBillDiscount, lineSavingsDisplay, lineNet, lineTax, lineTotalWithTax, getProductStock, getCartLineStock, clampQtyToStock, remainingStock, parseQty, formatQty, roundQty } from '../utils/billing'
 import { getAvailableBatches, getProductBatches, productForBatch, formatBatchSummary } from '../utils/productBatches'
 import BatchPickModal from '../components/billing/BatchPickModal'
-import { useAsyncAction, delay } from '../hooks/useAsyncAction'
+import { useAsyncAction } from '../hooks/useAsyncAction'
 import { usePendingChanges } from '../hooks/usePendingChanges'
 import { validateBillDiscount } from '../utils/billingValidation'
 import { playPosAddSound } from '../utils/posSounds'
@@ -442,7 +442,6 @@ export default function PosPage() {
   const handlePrintBillConfirm = useCallback(
     ({ customerName, customerMobile }) => {
       runBill(async () => {
-        await delay(400)
         const orderPayload = {
           items: cart.map((item) => ({
             name: item.name,

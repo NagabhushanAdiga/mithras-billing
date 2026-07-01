@@ -6,7 +6,7 @@ import { roleLabel } from '../../utils/roles'
 import Button from '../common/Button'
 import InitialAvatar from '../common/InitialAvatar'
 import ConfirmDialog from '../common/ConfirmDialog'
-import { useAsyncAction, delay } from '../../hooks/useAsyncAction'
+import { useAsyncAction } from '../../hooks/useAsyncAction'
 import { usePendingChanges } from '../../hooks/usePendingChanges'
 
 const INITIAL = { showLogoutConfirm: false }
@@ -21,7 +21,6 @@ export default function Header({ onMenuClick }) {
   const handleLogoutClick = () => patchPendingChanges({ showLogoutConfirm: true })
   const handleLogoutConfirm = () => {
     runLogout(async () => {
-      await delay(300)
       logout()
       patchPendingChanges({ showLogoutConfirm: false })
     })

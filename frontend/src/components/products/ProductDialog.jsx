@@ -3,7 +3,7 @@ import { HiOutlineCube, HiOutlineX } from 'react-icons/hi'
 import Card from '../common/Card'
 import ProductForm, { PRODUCT_FORM_ID } from './ProductForm'
 import FormActions from '../common/FormActions'
-import { useAsyncAction, delay } from '../../hooks/useAsyncAction'
+import { useAsyncAction } from '../../hooks/useAsyncAction'
 
 export default function ProductDialog({ open, product, prefill, onSubmit, onCancel }) {
   const dialogRef = useRef(null)
@@ -40,8 +40,7 @@ export default function ProductDialog({ open, product, prefill, onSubmit, onCanc
 
   const handleSubmit = (data) => {
     run(async () => {
-      await delay(350)
-      onSubmit?.(data)
+      await Promise.resolve(onSubmit?.(data))
     })
   }
 

@@ -3,7 +3,7 @@ import { HiOutlineCollection } from 'react-icons/hi'
 import Input from '../common/Input'
 import FormActions from '../common/FormActions'
 import SliderPanelHeader from '../common/SliderPanelHeader'
-import { useAsyncAction, delay } from '../../hooks/useAsyncAction'
+import { useAsyncAction } from '../../hooks/useAsyncAction'
 import { usePendingChanges } from '../../hooks/usePendingChanges'
 
 const FORM_ID = 'group-form'
@@ -46,8 +46,7 @@ export default function GroupSlider({ open, category, onSubmit, onCancel }) {
       return
     }
     run(async () => {
-      await delay(300)
-      const result = onSubmit?.(trimmed, category)
+      const result = await Promise.resolve(onSubmit?.(trimmed, category))
       if (result === null || result === false) {
         patchPendingChanges({ error: 'A category with this name already exists.' })
         return

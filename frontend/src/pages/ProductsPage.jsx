@@ -8,7 +8,7 @@ import ProductDialog from '../components/products/ProductDialog'
 import ProductTable from '../components/products/ProductTable'
 import { useStore } from '../context/StoreContext'
 import { useToast } from '../context/ToastContext'
-import { useAsyncAction, delay } from '../hooks/useAsyncAction'
+import { useAsyncAction } from '../hooks/useAsyncAction'
 import { useHardwareScanner } from '../hooks/useHardwareScanner'
 import { usePendingChanges } from '../hooks/usePendingChanges'
 import { lookupBarcodeProduct } from '../utils/barcodeLookup'
@@ -129,7 +129,6 @@ export default function ProductsPage() {
   const confirmDelete = () => {
     if (!deleteConfirm) return
     runDelete(async () => {
-      await delay(300)
       await deleteProduct(deleteConfirm.id)
       showToast(`${deleteConfirm.name} removed`, 'info')
       patchPendingChanges({ deleteConfirm: null })

@@ -9,7 +9,7 @@ import PageHeader from '../components/common/PageHeader'
 import Pagination from '../components/common/Pagination'
 import { useStore } from '../context/StoreContext'
 import { useToast } from '../context/ToastContext'
-import { useAsyncAction, delay } from '../hooks/useAsyncAction'
+import { useAsyncAction } from '../hooks/useAsyncAction'
 import { usePagination } from '../hooks/usePagination'
 import { usePendingChanges } from '../hooks/usePendingChanges'
 
@@ -40,8 +40,8 @@ export default function BatchesPage() {
 
   const productCountFor = (batchId) => products.filter((p) => p.batchId === batchId).length
 
-  const handleAdd = (name) => {
-    const id = addBatch(name)
+  const handleAdd = async (name) => {
+    const id = await addBatch(name)
     if (!id) return null
     patchPendingChanges({ showAddSlider: false })
     showToast(`Batch "${name}" created`)
@@ -51,8 +51,7 @@ export default function BatchesPage() {
   const confirmDelete = () => {
     if (!deleteConfirm) return
     runDelete(async () => {
-      await delay(300)
-      deleteBatch(deleteConfirm.id)
+      await deleteBatch(deleteConfirm.id)
       showToast(`Batch "${deleteConfirm.name}" deleted`, 'info')
       patchPendingChanges({ deleteConfirm: null })
     })

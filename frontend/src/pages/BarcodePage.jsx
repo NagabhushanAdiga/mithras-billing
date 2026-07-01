@@ -4,11 +4,10 @@ import { HiOutlineDownload, HiOutlinePrinter, HiOutlineSparkles, HiOutlineTrash,
 import Card from '../components/common/Card'
 import Button from '../components/common/Button'
 import Input from '../components/common/Input'
-import PageHeader from '../components/common/PageHeader'
 import Pagination from '../components/common/Pagination'
 import { useStore } from '../context/StoreContext'
 import { useToast } from '../context/ToastContext'
-import { useAsyncAction, delay } from '../hooks/useAsyncAction'
+import { useAsyncAction } from '../hooks/useAsyncAction'
 import { usePagination } from '../hooks/usePagination'
 import { usePendingChanges } from '../hooks/usePendingChanges'
 import { sanitizeBarcode, generateUniqueBarcode, isBarcodeTaken } from '../utils/barcode'
@@ -349,7 +348,6 @@ export default function BarcodePage() {
   const handlePrint = () => {
     if (!validateBeforeExport()) return
     runPrint(async () => {
-      await delay(300)
       const copyCount = Math.max(1, Number(copies) || 1)
 
       const printWindow = window.open('', '_blank', 'width=900,height=700')
@@ -416,7 +414,6 @@ export default function BarcodePage() {
       return
     }
     runDownloadPng(async () => {
-      await delay(250)
       try {
         await downloadBarcodeImage(svgRef.current, {
           barcodeValue,
@@ -439,7 +436,6 @@ export default function BarcodePage() {
       return
     }
     runDownloadSvg(async () => {
-      await delay(200)
       downloadBarcodeSvg(svgRef.current, barcodeValue)
       showToast('Barcode downloaded as SVG')
       recordToHistory()
@@ -463,13 +459,6 @@ export default function BarcodePage() {
 
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
-      <PageHeader
-        icon={HiOutlinePrinter}
-        iconClassName="from-violet-500 to-fuchsia-600 shadow-fuchsia-600/25"
-        title="Barcode Studio"
-        description="Select a product or enter a name manually — barcodes are generated automatically and must be unique."
-      />
-
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
         <Card className="p-5 sm:p-6 xl:col-span-2 space-y-4">
           <div className="flex flex-wrap gap-2">

@@ -22,7 +22,7 @@ import { SupportProvider } from './Support/SupportContext'
 import { canAccessPath } from './config/navItems'
 import { usePendingChanges } from './hooks/usePendingChanges'
 
-const APP_INITIAL = { currentPath: '/', pageLoading: true }
+const APP_INITIAL = { currentPath: '/' }
 
 function AuthBootScreen() {
   return (
@@ -39,7 +39,7 @@ function AppContent() {
   const { isAuthenticated, user, isAuthReady } = useAuth()
   const { isStoreReady } = useStore()
   const { pendingChanges, patchPendingChanges } = usePendingChanges(APP_INITIAL)
-  const { currentPath, pageLoading } = pendingChanges
+  const { currentPath } = pendingChanges
 
   useEffect(() => {
     if (isAuthReady && !isAuthenticated) {
@@ -60,12 +60,7 @@ function AppContent() {
     }
   }
 
-  useEffect(() => {
-    if (!isAuthenticated) return undefined
-    patchPendingChanges({ pageLoading: true })
-    const timer = setTimeout(() => patchPendingChanges({ pageLoading: false }), 380)
-    return () => clearTimeout(timer)
-  }, [currentPath, isAuthenticated, patchPendingChanges])
+  const showSkeleton = !isStoreReady
 
   if (!isAuthReady) {
     if (user) {
@@ -82,7 +77,6 @@ function AppContent() {
     return <LoginPage onSuccess={() => {}} />
   }
 
-  const showSkeleton = !isStoreReady || pageLoading
   const safePath = canAccessPath(currentPath, user?.role) ? currentPath : '/'
 
   const renderPage = () => {

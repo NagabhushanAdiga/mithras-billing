@@ -126,10 +126,14 @@ export function StoreProvider({ children }) {
     applyServerData(data)
   }, [applyServerData])
 
+  const refreshStoreInBackground = useCallback(() => {
+    void reloadStore().catch(() => {})
+  }, [refreshStoreInBackground])
+
   useEffect(() => {
     if (!USE_API) {
-      const timer = setTimeout(() => setIsStoreReady(true), 350)
-      return () => clearTimeout(timer)
+      setIsStoreReady(true)
+      return undefined
     }
     if (!isAuthenticated || !user) {
       setIsStoreReady(false)
@@ -198,7 +202,7 @@ export function StoreProvider({ children }) {
     if (USE_API) {
       try {
         const { batch } = await createBatch(trimmed)
-        await reloadStore()
+        setBatches((prev) => [...prev.filter((b) => b.id !== batch.id), batch])
         return batch.id
       } catch {
         return null
@@ -210,13 +214,14 @@ export function StoreProvider({ children }) {
     setBatches((prev) => [...prev, { id, name: trimmed }])
     logAudit('batch_created', { category: 'category', details: trimmed })
     return id
-  }, [batches, reloadStore])
+  }, [batches, refreshStoreInBackground])
 
   const deleteBatch = useCallback(async (id) => {
     if (USE_API) {
       try {
         await removeBatch(id)
-        await reloadStore()
+        setBatches((prev) => prev.filter((b) => b.id !== id))
+        refreshStoreInBackground()
       } catch {
         // ignore
       }
@@ -228,7 +233,7 @@ export function StoreProvider({ children }) {
       prods.map((p) => (p.batchId === id ? { ...p, batch: '', batchId: '' } : p))
     )
     logAudit('batch_deleted', { category: 'category', details: batch?.name || id })
-  }, [batches, reloadStore])
+  }, [batches, refreshStoreInBackground])
 
   const addGroup = useCallback(async (name) => {
     const trimmed = String(name).trim()
@@ -236,7 +241,7 @@ export function StoreProvider({ children }) {
     if (USE_API) {
       try {
         const { group } = await createCategory(trimmed)
-        await reloadStore()
+        setGroups((prev) => normalizeGroups([...prev, group]))
         return group.id
       } catch {
         return null
@@ -248,15 +253,21 @@ export function StoreProvider({ children }) {
     setGroups((prev) => [...prev, { id, name: trimmed, subcategories: [] }])
     logAudit('category_created', { category: 'category', details: trimmed })
     return id
-  }, [groups, reloadStore])
+  }, [groups, refreshStoreInBackground])
 
   const updateGroup = useCallback(async (id, name) => {
     const trimmed = String(name).trim()
     if (!trimmed) return false
     if (USE_API) {
       try {
-        await updateCategory(id, trimmed)
-        await reloadStore()
+        const { group } = await updateCategory(id, trimmed)
+        setGroups((prev) => {
+          const next = normalizeGroups(prev.map((g) => (g.id === id ? group : g)))
+          setProducts((prods) =>
+            prods.map((p) => (p.groupId === id ? applyCategoryToProduct(p, next) : p))
+          )
+          return next
+        })
         return true
       } catch {
         return false
@@ -278,15 +289,15 @@ export function StoreProvider({ children }) {
     )
     logAudit('category_updated', { category: 'category', details: trimmed })
     return true
-  }, [groups, reloadStore])
+  }, [groups, refreshStoreInBackground])
 
   const addSubcategory = useCallback(async (groupId, name) => {
     const trimmed = String(name).trim()
     if (!trimmed) return null
     if (USE_API) {
       try {
-        const { subcategory } = await createSubcategory(groupId, trimmed)
-        await reloadStore()
+        const { subcategory, group } = await createSubcategory(groupId, trimmed)
+        setGroups((prev) => normalizeGroups(prev.map((g) => (g.id === groupId ? group : g))))
         return subcategory.id
       } catch {
         return null
@@ -309,15 +320,25 @@ export function StoreProvider({ children }) {
       details: `${group.name} → ${trimmed}`,
     })
     return id
-  }, [groups, reloadStore])
+  }, [groups, refreshStoreInBackground])
 
   const updateSubcategory = useCallback(async (groupId, subcategoryId, name) => {
     const trimmed = String(name).trim()
     if (!trimmed) return false
     if (USE_API) {
       try {
-        await updateSubcategory(groupId, subcategoryId, trimmed)
-        await reloadStore()
+        const { group } = await updateSubcategory(groupId, subcategoryId, trimmed)
+        setGroups((prev) => {
+          const next = normalizeGroups(prev.map((g) => (g.id === groupId ? group : g)))
+          setProducts((prods) =>
+            prods.map((p) =>
+              p.groupId === groupId && p.subcategoryId === subcategoryId
+                ? applyCategoryToProduct(p, next)
+                : p
+            )
+          )
+          return next
+        })
         return true
       } catch {
         return false
@@ -358,13 +379,23 @@ export function StoreProvider({ children }) {
       details: `${group.name} → ${sub?.name || subcategoryId} renamed to ${trimmed}`,
     })
     return true
-  }, [groups, reloadStore])
+  }, [groups, refreshStoreInBackground])
 
   const deleteSubcategory = useCallback(async (groupId, subcategoryId) => {
     if (USE_API) {
       try {
-        await removeSubcategory(groupId, subcategoryId)
-        await reloadStore()
+        const { group } = await removeSubcategory(groupId, subcategoryId)
+        setGroups((prev) => {
+          const next = normalizeGroups(prev.map((g) => (g.id === groupId ? group : g)))
+          setProducts((prods) =>
+            prods.map((p) =>
+              p.groupId === groupId && p.subcategoryId === subcategoryId
+                ? applyCategoryToProduct({ ...p, subcategoryId: '' }, next)
+                : p
+            )
+          )
+          return next
+        })
       } catch {
         // ignore
       }
@@ -389,13 +420,14 @@ export function StoreProvider({ children }) {
       category: 'category',
       details: `${group?.name || groupId} → ${sub?.name || subcategoryId}`,
     })
-  }, [groups, reloadStore])
+  }, [groups, refreshStoreInBackground])
 
   const deleteGroup = useCallback(async (id) => {
     if (USE_API) {
       try {
         await removeCategory(id)
-        await reloadStore()
+        setGroups((prev) => prev.filter((g) => g.id !== id))
+        refreshStoreInBackground()
       } catch {
         // ignore
       }
@@ -411,7 +443,7 @@ export function StoreProvider({ children }) {
       )
     )
     logAudit('category_deleted', { category: 'category', details: group?.name || id })
-  }, [groups, reloadStore])
+  }, [groups, refreshStoreInBackground])
 
   const getProductByBarcode = useCallback(
     (barcode) => products.find((p) => p.barcode === String(barcode).trim()),
@@ -428,8 +460,14 @@ export function StoreProvider({ children }) {
 
     if (USE_API) {
       try {
-        const { id } = await createProduct({ ...product, barcode: code })
-        await reloadStore()
+        const { product: created, id } = await createProduct({ ...product, barcode: code })
+        setProducts((prev) =>
+          normalizeProducts(
+            [...prev.filter((p) => p.id !== created.id), created],
+            groups,
+            batches
+          )
+        )
         return id
       } catch {
         return null
@@ -460,7 +498,7 @@ export function StoreProvider({ children }) {
       details: `${normalized.name} (${code})`,
     })
     return id
-  }, [groups, products, reloadStore])
+  }, [groups, products, batches])
 
   const updateProduct = useCallback(async (id, updates) => {
     const existing = products.find((p) => p.id === id)
@@ -468,8 +506,14 @@ export function StoreProvider({ children }) {
 
     if (USE_API) {
       try {
-        await updateProduct(id, safeUpdates)
-        await reloadStore()
+        const { product } = await updateProduct(id, safeUpdates)
+        setProducts((prev) =>
+          normalizeProducts(
+            prev.map((p) => (p.id === id ? product : p)),
+            groups,
+            batches
+          )
+        )
         return { ok: true }
       } catch (err) {
         return { ok: false, error: err.message || 'Update failed' }
@@ -509,13 +553,13 @@ export function StoreProvider({ children }) {
       details: existing?.name || id,
     })
     return { ok: true }
-  }, [groups, products, reloadStore])
+  }, [groups, products, batches])
 
   const deleteProduct = useCallback(async (id) => {
     if (USE_API) {
       try {
         await removeProduct(id)
-        await reloadStore()
+        setProducts((prev) => prev.filter((p) => p.id !== id))
       } catch {
         // ignore
       }
@@ -527,13 +571,13 @@ export function StoreProvider({ children }) {
       category: 'product',
       details: product?.name || id,
     })
-  }, [products, reloadStore])
+  }, [products])
 
   const eraseAllData = useCallback(async () => {
     if (USE_API) {
       try {
         await eraseAll()
-        await reloadStore()
+        refreshStoreInBackground()
       } catch {
         // ignore
       }
@@ -548,7 +592,7 @@ export function StoreProvider({ children }) {
       category: 'settings',
       details: 'All products, orders, categories, and settings reset',
     })
-  }, [reloadStore])
+  }, [refreshStoreInBackground])
 
   const purgeStoreData = useCallback(async (options = {}) => {
     const {
@@ -568,7 +612,7 @@ export function StoreProvider({ children }) {
           orders: Boolean(delOrders),
           settings: Boolean(delSettings),
         })
-        await reloadStore()
+        refreshStoreInBackground()
       } catch {
         // ignore
       }
@@ -603,12 +647,13 @@ export function StoreProvider({ children }) {
         details: `Removed: ${removed.join(', ')}`,
       })
     }
-  }, [reloadStore])
+  }, [refreshStoreInBackground])
 
   const addOrder = useCallback(async (order) => {
     if (USE_API) {
-      const { id } = await createOrder(order)
-      await reloadStore()
+      const { order, id } = await createOrder(order)
+      setOrders((prev) => [order, ...prev.filter((o) => o.id !== order.id)])
+      refreshStoreInBackground()
       return id
     }
 
@@ -655,7 +700,7 @@ export function StoreProvider({ children }) {
       details: `Bill ${id} · ${order.items?.length || 0} items · total ${Number(order.total || 0).toFixed(2)}`,
     })
     return id
-  }, [orders, reloadStore])
+  }, [orders, refreshStoreInBackground])
 
   const value = {
     products,

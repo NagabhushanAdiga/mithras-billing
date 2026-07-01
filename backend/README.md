@@ -112,3 +112,16 @@ VITE_API_URL=http://localhost:4000/api
 - Use MongoDB Atlas or a managed MongoDB instance
 - Set `MONGODB_URI` to your Atlas connection string
 - Enable network access and database user in Atlas
+
+### Deploy on Vercel
+
+1. Import the repo and set **Root Directory** to `backend`
+2. Add environment variables in Vercel → Settings → Environment Variables:
+   - `MONGODB_URI` — Atlas connection string (`@` in password must be `%40`)
+   - `JWT_SECRET` — long random string
+   - `CORS_ORIGIN` — your frontend URL(s), comma-separated  
+     e.g. `https://your-app.vercel.app,http://localhost:5173`
+3. Deploy — API base URL is `https://your-backend.vercel.app/api`
+4. Test: `https://your-backend.vercel.app/api/health`
+
+Set the frontend `VITE_API_URL` to your Vercel backend URL + `/api`.

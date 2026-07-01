@@ -1,28 +1,38 @@
 import mongoose from 'mongoose'
 import { env } from './env.js'
 
-let isConnected = false
+const globalCache = globalThis
+
+if (!globalCache._mongooseCache) {
+  globalCache._mongooseCache = { conn: null, promise: null }
+}
+
+const cache = globalCache._mongooseCache
 
 export async function connectDb() {
-  if (isConnected && mongoose.connection.readyState === 1) {
-    return mongoose.connection
+  if (cache.conn && mongoose.connection.readyState === 1) {
+    return cache.conn
   }
 
-  mongoose.set('strictQuery', true)
+  if (!cache.promise) {
+    mongoose.set('strictQuery', true)
+    cache.promise = mongoose
+      .connect(env.mongodbUri, {
+        serverSelectionTimeoutMS: 10000,
+        bufferCommands: false,
+      })
+      .then((instance) => instance)
+  }
 
-  await mongoose.connect(env.mongodbUri, {
-    serverSelectionTimeoutMS: 10000,
-  })
-
-  isConnected = true
-  console.log('MongoDB connected:', env.mongodbUri.replace(/\/\/.*@/, '//***@'))
-  return mongoose.connection
+  cache.conn = await cache.promise
+  return cache.conn
 }
 
 export async function disconnectDb() {
-  if (!isConnected) return
+  if (!cache.conn) return
   await mongoose.disconnect()
-  isConnected = false
+  cache.conn = null
+  cache.promise = null
 }
 
 export function getConnectionState() {
